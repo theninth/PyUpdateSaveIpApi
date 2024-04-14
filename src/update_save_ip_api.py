@@ -23,28 +23,44 @@ if APIKEY == None:
 
 def job():
     try:
-        response = requests.get('https://api.ipify.org', timeout=10)
-        ip = response.content.decode('ascii')
-
-        post_headers = { 'ApiKey': APIKEY }
-        post_content = { 'ip': ip }
-
-        response = requests.post(
-            f'https://{HOSTNAME}/ip/{KEY}',
-            headers=post_headers,
-            json=post_content,
-            timeout=10)
-        if response.status_code == 200:
-            print(f'Sent ip {ip} to {HOSTNAME}')
+        success, ip = get_public_ip()
+        if success:
+            post_ip(ip)
         else:
-            print(f'Unable to send ip. Server replied with status {response.status_code}.')
+            print('Unable to get public ip from ipify.')
     except Exception as e:
         print (f'Error: Unable to get or send ip: {e}')
+
+
+def get_public_ip():
+    response = requests.get('https://api.ipify.org', timeout=10)
+    if response.status_code != 200:
+        print(f'Recieved status code {response.status_code} from ipify.')
+    success = response.status_code == 200
+    ip = response.content.decode('ascii')
+    return (success, ip)
+
+
+def post_ip(ip):
+    post_headers = { 'ApiKey': APIKEY }
+    post_content = { 'ip': ip }
+
+    response = requests.post(
+        f'https://{HOSTNAME}/ip/{KEY}',
+        headers=post_headers,
+        json=post_content,
+        timeout=10)
+    if response.status_code == 200:
+        print(f'Sent ip {ip} to {HOSTNAME}')
+    else:
+        print(f'Unable to send ip. Server replied with status {response.status_code}.')
+
 
 schedule.every(1).hours.do(job)
 
 if __name__ == '__main__':
     print('Starting Application.')
+    job()
     while True:
         schedule.run_pending()
         time.sleep(1)
