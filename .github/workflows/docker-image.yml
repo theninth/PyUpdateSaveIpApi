@@ -24,3 +24,29 @@ jobs:
         file: Dockerfile
         push: true
         tags: thenajnth/py_update_save_ip_api:${{ github.run_number }}
+
+
+  deploy:
+    runs-on: [self-hosted, linux, x64]
+    needs: build
+    steps:
+    - name: Update Docker compose file
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: sed -i -E 's/thenajnth\/py_update_save_ip_api:[[:digit:]]+/thenajnth\/py_update_save_ip_api:${{ github.run_number }}/g' ${{ secrets.DOCKER_COMPOSE_PATH }}/docker-compose.yml
+  
+    - name: Restart Docker compose
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          cd ${{ secrets.DOCKER_COMPOSE_PATH }}
+          docker compose down
+          docker compose up -d
