@@ -10,17 +10,6 @@ KEY = os.getenv('SAVEIPAPI_KEY')
 HOSTNAME = os.getenv('SAVEIPAPI_HOSTNAME')
 APIKEY = os.environ.get('SAVEIPAPI_APIKEY')
 
-
-if KEY == None:
-    print('Unable to find environment variable for SAVEIPAPI_KEY. Program ends.')
-    sys.exit(1)
-if HOSTNAME == None:
-    print('Unable to find environment variable for SAVEIPAPI_HOSTNAME. Program ends.')
-    sys.exit(1)
-if APIKEY == None:
-    print('Unable to find environment variable for SAVEIPAPI_APIKEY. Program ends.')
-    sys.exit(1)
-
 def job():
     try:
         success, ip = get_public_ip()
@@ -56,11 +45,29 @@ def post_ip(ip):
         print(f'Unable to send ip. Server replied with status {response.status_code}.')
 
 
-schedule.every(1).hours.do(job)
+def check_environment_variables():
+    if KEY == None:
+        print('Unable to find environment variable for SAVEIPAPI_KEY. Program ends.')
+        sys.exit(1)
+    if HOSTNAME == None:
+        print('Unable to find environment variable for SAVEIPAPI_HOSTNAME. Program ends.')
+        sys.exit(1)
+    if APIKEY == None:
+        print('Unable to find environment variable for SAVEIPAPI_APIKEY. Program ends.')
+        sys.exit(1)
+
 
 if __name__ == '__main__':
+    check_environment_variables()
     print('Starting Application.')
-    job()
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    
+    try:
+        job()
+
+        schedule.every(1).hours.do(job)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print('Program interupted by user')
+        sys.exit(0)
