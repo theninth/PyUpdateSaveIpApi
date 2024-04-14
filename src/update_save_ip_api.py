@@ -3,16 +3,17 @@
 import time
 import os
 import sys
+import urllib.parse
 import requests
 import schedule
 
 IPIFY_URL = 'https://api.ipify.org'
 KEY_ENVNAME = 'SAVEIPAPI_KEY'
-HOSTNAME_ENVNAME = 'SAVEIPAPI_HOSTNAME'
+BASEURL_ENVNAME = 'SAVEIPAPI_BASEURL'
 APIKEY_ENVNAME = 'SAVEIPAPI_APIKEY'
 
 KEY = os.getenv(KEY_ENVNAME)
-HOSTNAME = os.getenv(HOSTNAME_ENVNAME)
+BASEURL = os.getenv(BASEURL_ENVNAME)
 APIKEY = os.environ.get(APIKEY_ENVNAME)
 
 
@@ -41,12 +42,12 @@ def post_ip(ip):
     post_content = { 'ip': ip }
 
     response = requests.post(
-        f'https://{HOSTNAME}/ip/{KEY}',
+        urllib.parse.urljoin(BASEURL, f'/ip/{KEY}'),
         headers=post_headers,
         json=post_content,
         timeout=10)
     if response.status_code == 200:
-        print(f'Sent ip {ip} to {HOSTNAME}')
+        print(f'Sent ip {ip} to {BASEURL}')
     else:
         print(f'Unable to send ip. Server replied with status {response.status_code}.')
 
@@ -55,8 +56,8 @@ def check_environment_variables():
     if KEY == None:
         print(f'Unable to find environment variable for {KEY_ENVNAME}. Program ends.')
         sys.exit(1)
-    if HOSTNAME == None:
-        print(f'Unable to find environment variable for {HOSTNAME_ENVNAME}. Program ends.')
+    if BASEURL == None:
+        print(f'Unable to find environment variable for {BASEURL_ENVNAME}. Program ends.')
         sys.exit(1)
     if APIKEY == None:
         print(f'Unable to find environment variable for {APIKEY_ENVNAME}. Program ends.')
