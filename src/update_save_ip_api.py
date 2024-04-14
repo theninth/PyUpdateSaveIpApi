@@ -6,9 +6,15 @@ import sys
 import requests
 import schedule
 
-KEY = os.getenv('SAVEIPAPI_KEY')
-HOSTNAME = os.getenv('SAVEIPAPI_HOSTNAME')
-APIKEY = os.environ.get('SAVEIPAPI_APIKEY')
+IPIFY_URL = 'https://api.ipify.org'
+KEY_ENVNAME = 'SAVEIPAPI_KEY'
+HOSTNAME_ENVNAME = 'SAVEIPAPI_HOSTNAME'
+APIKEY_ENVNAME = 'SAVEIPAPI_APIKEY'
+
+KEY = os.getenv(KEY_ENVNAME)
+HOSTNAME = os.getenv(HOSTNAME_ENVNAME)
+APIKEY = os.environ.get(APIKEY_ENVNAME)
+
 
 def job():
     try:
@@ -22,7 +28,7 @@ def job():
 
 
 def get_public_ip():
-    response = requests.get('https://api.ipify.org', timeout=10)
+    response = requests.get(IPIFY_URL, timeout=10)
     if response.status_code != 200:
         print(f'Recieved status code {response.status_code} from ipify.')
     success = response.status_code == 200
@@ -47,13 +53,13 @@ def post_ip(ip):
 
 def check_environment_variables():
     if KEY == None:
-        print('Unable to find environment variable for SAVEIPAPI_KEY. Program ends.')
+        print(f'Unable to find environment variable for {KEY_ENVNAME}. Program ends.')
         sys.exit(1)
     if HOSTNAME == None:
-        print('Unable to find environment variable for SAVEIPAPI_HOSTNAME. Program ends.')
+        print(f'Unable to find environment variable for {HOSTNAME_ENVNAME}. Program ends.')
         sys.exit(1)
     if APIKEY == None:
-        print('Unable to find environment variable for SAVEIPAPI_APIKEY. Program ends.')
+        print(f'Unable to find environment variable for {APIKEY_ENVNAME}. Program ends.')
         sys.exit(1)
 
 
