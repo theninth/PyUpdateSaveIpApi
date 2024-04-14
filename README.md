@@ -2,6 +2,7 @@ UPDATE SAVE IP API
 ==================
 
 A Simple script that could be run from a container to update [SaveIpApi](https://github.com/theninth/SaveIpApi).
+It fetches the users public ip address via [ipify](https://www.ipify.org/).
 
 ## Example produktion docker-compose.yaml-file
 
